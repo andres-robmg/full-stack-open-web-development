@@ -31,4 +31,4 @@ sequenceDiagram
   server ->> browser: sends the response {"message":"note created"} (201 created)
   deactivate server
 
-  Note right of browser: The browser doesn't do any redirection, the JavaScript code executes only the re-render of the notes list
+  Note right of browser: The browser doesn't do any redirection, it executes only the JavaScript code that re-renders the notes list with the current note
