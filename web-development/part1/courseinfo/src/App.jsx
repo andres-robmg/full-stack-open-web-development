@@ -43,47 +43,29 @@ const Total = ({ parts }) => {
 
 
 const App = () => {
-  const course = 'Half Stack application development'
-
-  // Part 1.3 Refactoring: Variables/ Objects definition
-  /* const part1 = {
-    name: 'Fundamentals of React',
-    exercises: 10
+  const course = {
+    name: 'Half Stack application development',
+    parts: [
+      {
+        name: 'Fundamentals of React',
+        exercises: 10
+      },
+      {
+        name: 'Using props to pass data',
+        exercises: 7
+      },
+      {
+        name: 'State of a component',
+        exercises: 14
+      }
+    ]
   }
-  const part2 = {
-    name: 'Using props to pass data',
-    exercises: 7
-  }
-  const part3 = {
-    name: 'State of a component',
-    exercises: 14
-  } */
 
-  const parts = [
-    {
-      name: 'Fundamentals of React',
-      exercises: 10
-    },
-    {
-      name: 'Using props to pass data',
-      exercises: 7
-    },
-    {
-      name: 'State of a component',
-      exercises: 14
-    }
-  ]
-
-  // Refactoring: Objects in array (same as 1.4 requirement but with other approach)
-  /* const parts = [
-    part1,
-    part2,
-    part3,
-  ] */
+  const { name, parts } = course
 
   return (
     <div>
-      <Header course={course} />
+      <Header course={name} />
       <Content parts={parts} />
       <Total parts={parts} />
     </div>
