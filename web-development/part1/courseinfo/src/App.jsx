@@ -29,10 +29,14 @@ const Part = ({ name, exercises }) => {
   )
 }
 
-const Total = ({ exercises }) => {
+const Total = ({ parts }) => {
+  let totalExercises = 0
+  parts.forEach(part => {
+    totalExercises = totalExercises + part.exercises
+  });
   return (
     <div>
-      <p>Number of exercises {exercises}</p>
+      <p>Number of exercises {totalExercises}</p>
     </div>
   )
 }
@@ -42,7 +46,7 @@ const App = () => {
   const course = 'Half Stack application development'
 
   // Part 1.3 Refactoring: Variables/ Objects definition
-  const part1 = {
+  /* const part1 = {
     name: 'Fundamentals of React',
     exercises: 10
   }
@@ -53,23 +57,35 @@ const App = () => {
   const part3 = {
     name: 'State of a component',
     exercises: 14
-  }
+  } */
+
+  const parts = [
+    {
+      name: 'Fundamentals of React',
+      exercises: 10
+    },
+    {
+      name: 'Using props to pass data',
+      exercises: 7
+    },
+    {
+      name: 'State of a component',
+      exercises: 14
+    }
+  ]
 
   // Refactoring: Objects in array (same as 1.4 requirement but with other approach)
-  const parts = [
+  /* const parts = [
     part1,
     part2,
     part3,
-  ]
-
-  const totalExercises = part1.exercises + part2.exercises + part3.exercises
-
+  ] */
 
   return (
     <div>
       <Header course={course} />
       <Content parts={parts} />
-      <Total exercises={totalExercises} />
+      <Total parts={parts} />
     </div>
   )
 }
