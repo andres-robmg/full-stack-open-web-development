@@ -1,0 +1,11 @@
+.feedback-text {
+    margin-top: 20px;
+}
+
+.buttons-box {
+    display: flex;
+}
+
+.button-container {
+    margin: 2px;
+}
