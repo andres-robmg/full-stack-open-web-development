@@ -1,0 +1,21 @@
+/* index.css stylesheet */
+
+.notification-container-error {
+    width: auto;
+    border: 2px solid #b9210a;
+    border-radius: 0.3em;
+    color: #b9210a;
+    background-color: rgb(179, 183, 183);
+    margin: 10px 0px;
+    padding: 10px 5px;
+}
+
+.notification-container-success {
+    width: auto;
+    border: 2px solid #0d4f0d;
+    border-radius: 0.3em;
+    color: #0d4f0d;
+    background-color: rgb(179, 183, 183);
+    margin: 10px 0px;
+    padding: 10px 5px;
+}

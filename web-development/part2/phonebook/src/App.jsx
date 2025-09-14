@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { Children, useEffect, useState } from 'react'
 import './App.css'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/persons'
+import { Notification } from './components/Notification'
+import { HttpStatusCode } from 'axios'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -14,7 +16,16 @@ const App = () => {
   const [newPhone, setNewPhone] = useState('')
   const [searchString, setSearchString] = useState('')
 
-  let contactsList;
+  const [isSuccesful, setIsSuccesful] = useState(false)
+  const [currentContactName, setCurrentContactName] = useState('')
+  const [actionType, setActionType] = useState('')
+
+  const enableNotification = () => {
+    setIsSuccesful(true)
+    setTimeout(() => {
+      setIsSuccesful(false)
+    }, 2500);
+  }
 
   useEffect(() => {
     getListContacts();
@@ -36,7 +47,28 @@ const App = () => {
 
   // API Method create(i)
   const addNewContact = (currentContact) => {
-    personService.create(currentContact)
+    setActionType('ACTION_ADD')
+    personService.create(currentContact).then(response => {
+      if (response.status === HttpStatusCode.Created) {
+        enableNotification()
+      }
+    })
+  }
+
+  const updateContact = (id, currentContact) => {
+    setActionType('ACTION_UPDATE')
+    personService.update(id, currentContact).then(response => {
+      if (response.status === HttpStatusCode.Ok) {
+        enableNotification()
+      }
+    })
+      .then(e => refreshList())
+      .catch(error => {
+        setActionType('ACTION_ERROR')
+        enableNotification()
+        refreshList()
+      })
+
   }
 
   // ENDOF API Methods
@@ -45,8 +77,9 @@ const App = () => {
     event.preventDefault()
     const isNewNameOnPhonebook = persons.find(e => e.name.toLowerCase().trim() === newName.toLowerCase().trim())
     const isNewPhoneOnPhonebook = persons.find(e => e.number.trim() === newPhone.trim())
-    const newId = persons.length + 1
+    const newId = Number(persons[persons.length - 1].id) + 1
     const currentContact = { name: newName, number: newPhone, id: newId.toString() }
+    setCurrentContactName(newName);
     if (!isNewNameOnPhonebook && !isNewPhoneOnPhonebook) {
 
       const newArray = [...persons, currentContact]
@@ -62,6 +95,7 @@ const App = () => {
       // reset inputs
       setNewName('')
       setNewPhone('')
+
     } else {
       if (isNewPhoneOnPhonebook) {
         alert(`${newPhone} is already added to phonebook`)
@@ -69,13 +103,10 @@ const App = () => {
         if (isNewNameOnPhonebook) {
           const confirmation = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
           if (confirmation) {
-            personService.update(isNewNameOnPhonebook.id, currentContact).then(e => refreshList())
+            updateContact(isNewNameOnPhonebook.id, currentContact)
           }
         }
       }
-
-
-
     }
   }
 
@@ -106,6 +137,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      {isSuccesful && <Notification actionType={actionType} currentContact={currentContactName} />}
       <Filter handleChangeSearchString={handleChangeSearchString} searchString={searchString} />
       <h3>Add a new</h3>
       <PersonForm newName={newName} newPhone={newPhone}
@@ -113,7 +145,7 @@ const App = () => {
         handleChangeSearchString={handleChangeSearchString}
         handleSubmitForm={handleSubmitForm} />
       <h3>Numbers</h3>
-      <Persons persons={persons} refresh={refreshList} />
+      <Persons persons={persons} refresh={refreshList} enableNotification={enableNotification} setActionType={setActionType} />
     </div>
   )
 }
