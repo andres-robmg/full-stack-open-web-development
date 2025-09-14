@@ -1,8 +1,10 @@
-const Persons = ({ persons }) => {
+import { Person } from "./Person"
+
+const Persons = ({ persons, refresh }) => {
   return (
     <div>
       <ul>
-        {persons.map(person => <li key={`${person.name}`}>{`${person.name} ${person.number}`}</li>)}
+        {persons.map(person => <Person key={person.name} person={person} refresh={refresh}/>)}
       </ul>
     </div>
   )

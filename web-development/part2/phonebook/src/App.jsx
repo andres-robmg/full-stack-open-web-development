@@ -1,16 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import personService from './services/persons'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ])
+  const [persons, setPersons] = useState([])
 
   const [backup, setBackup] = useState([...persons])
 
@@ -18,25 +14,68 @@ const App = () => {
   const [newPhone, setNewPhone] = useState('')
   const [searchString, setSearchString] = useState('')
 
+  let contactsList;
+
+  useEffect(() => {
+    getListContacts();
+    return () => {
+    }
+  }, [])
+
+  const refreshList = () => {
+    getListContacts()
+  }
+
+  // API Method getAll()
+  const getListContacts = () => {
+    personService.getAll().then(response => {
+      setPersons(response.data)
+      setBackup(response.data)
+    })
+  }
+
+  // API Method create(i)
+  const addNewContact = (currentContact) => {
+    personService.create(currentContact)
+  }
+
+  // ENDOF API Methods
+
   const handleSubmitForm = () => {
     event.preventDefault()
     const isNewNameOnPhonebook = persons.find(e => e.name.toLowerCase().trim() === newName.toLowerCase().trim())
     const isNewPhoneOnPhonebook = persons.find(e => e.number.trim() === newPhone.trim())
-
+    const newId = persons.length + 1
+    const currentContact = { name: newName, number: newPhone, id: newId.toString() }
     if (!isNewNameOnPhonebook && !isNewPhoneOnPhonebook) {
-      const newId = persons.length + 1
-      const newArray = [...persons, { name: newName, number: newPhone, id: newId }]
+
+      const newArray = [...persons, currentContact]
+
+      // send data to the state but adding the new contact info
       setPersons(newArray)
+
+      addNewContact(currentContact)
+
+      // update backup
       setBackup(newArray)
+
+      // reset inputs
       setNewName('')
       setNewPhone('')
     } else {
       if (isNewPhoneOnPhonebook) {
         alert(`${newPhone} is already added to phonebook`)
+      } else {
+        if (isNewNameOnPhonebook) {
+          const confirmation = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
+          if (confirmation) {
+            personService.update(isNewNameOnPhonebook.id, currentContact).then(e => refreshList())
+          }
+        }
       }
-      if (isNewNameOnPhonebook) {
-        alert(`${newName} is already added to phonebook`)
-      }
+
+
+
     }
   }
 
@@ -74,7 +113,7 @@ const App = () => {
         handleChangeSearchString={handleChangeSearchString}
         handleSubmitForm={handleSubmitForm} />
       <h3>Numbers</h3>
-      <Persons persons={persons} />
+      <Persons persons={persons} refresh={refreshList} />
     </div>
   )
 }
