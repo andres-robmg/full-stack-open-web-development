@@ -1,6 +1,7 @@
 import axios from "axios"
 
-const BASE_URL = 'https://phonebook-server-tupz.onrender.com/api/persons'
+/* const BASE_URL = 'https://phonebook-server-tupz.onrender.com/api/persons' */
+const BASE_URL = '/api/persons'
 
 const getAll = () => {
     return axios.get(BASE_URL)

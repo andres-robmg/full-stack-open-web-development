@@ -53,6 +53,7 @@ const App = () => {
         enableNotification()
       }
     })
+    .then(e => refreshList())
   }
 
   const updateContact = (id, currentContact) => {
@@ -77,20 +78,20 @@ const App = () => {
     event.preventDefault()
     const isNewNameOnPhonebook = persons.find(e => e.name.toLowerCase().trim() === newName.toLowerCase().trim())
     const isNewPhoneOnPhonebook = persons.find(e => e.number.trim() === newPhone.trim())
-    const newId = Number(persons[persons.length - 1].id) + 1
-    const currentContact = { name: newName, number: newPhone, id: newId.toString() }
+    /* const newId = Number(persons[persons.length - 1].id) + 1 */
+    const currentContact = { name: newName, number: newPhone/* , id: newId.toString() */ }
     setCurrentContactName(newName);
     if (!isNewNameOnPhonebook && !isNewPhoneOnPhonebook) {
 
       const newArray = [...persons, currentContact]
 
       // send data to the state but adding the new contact info
-      setPersons(newArray)
+      /* setPersons(newArray) */
 
       addNewContact(currentContact)
 
       // update backup
-      setBackup(newArray)
+      /* setBackup(newArray) */
 
       // reset inputs
       setNewName('')
