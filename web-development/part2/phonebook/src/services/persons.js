@@ -1,7 +1,8 @@
 import axios from "axios"
 
 /* const BASE_URL = 'https://phonebook-server-tupz.onrender.com/api/persons' */
-const BASE_URL = '/api/persons'
+const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL
+const BASE_URL = `${BACKEND_API_URL}/api/persons`
 
 const getAll = () => {
     return axios.get(BASE_URL)
