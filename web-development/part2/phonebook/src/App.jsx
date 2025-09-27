@@ -49,7 +49,7 @@ const App = () => {
   const addNewContact = (currentContact) => {
     setActionType('ACTION_ADD')
     personService.create(currentContact).then(response => {
-      if (response.status === HttpStatusCode.Created) {
+      if (response.status === HttpStatusCode.Created || response.status === HttpStatusCode.Ok) {
         enableNotification()
       }
     })
