@@ -7,7 +7,10 @@ morgan.token('body', (req) => JSON.stringify(req.body))
 
 const app = express()
 app.use(cors({
-  origin: 'https://full-stack-open-web-development.onrender.com'
+  origin: [
+    'https://full-stack-open-web-development.onrender.com',
+    'http://localhost:5173'
+  ]
 }))
 app.use(express.json())
 
