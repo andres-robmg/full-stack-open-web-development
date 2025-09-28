@@ -19,12 +19,17 @@ const App = () => {
   const [isSuccesful, setIsSuccesful] = useState(false)
   const [currentContactName, setCurrentContactName] = useState('')
   const [actionType, setActionType] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+
+
+  // Enable notification for 2.5 seconds
 
   const enableNotification = () => {
     setIsSuccesful(true)
+    const time = actionType === 'ACTION_VALIDATION_ERROR' ? 10000 : 2500;
     setTimeout(() => {
       setIsSuccesful(false)
-    }, 2500);
+    }, time);
   }
 
   useEffect(() => {
@@ -47,13 +52,26 @@ const App = () => {
 
   // API Method create(i)
   const addNewContact = (currentContact) => {
+    const currentContactName = currentContact.name
+    const currentContactPhone = currentContact.number
     setActionType('ACTION_ADD')
     personService.create(currentContact).then(response => {
       if (response.status === HttpStatusCode.Created || response.status === HttpStatusCode.Ok) {
         enableNotification()
       }
     })
-    .then(e => refreshList())
+      .then(e => refreshList())
+      .catch(error => {
+        console.log(error)
+        console.log(error.response.data.error)
+        if (error.status === 400) {
+          setErrorMessage(error.response.data.error)
+          setActionType('ACTION_VALIDATION_ERROR')
+          enableNotification()
+          setNewName(currentContactName)
+          setNewPhone(currentContactPhone)
+        }
+      })
   }
 
   const updateContact = (id, currentContact) => {
@@ -65,9 +83,13 @@ const App = () => {
     })
       .then(e => refreshList())
       .catch(error => {
-        setActionType('ACTION_ERROR')
-        enableNotification()
-        refreshList()
+        if (error.status === 400) {
+          setErrorMessage(error.response.data.error)
+          setActionType('ACTION_VALIDATION_ERROR')
+          enableNotification()
+          setNewName(currentContactName)
+          setNewPhone(currentContactPhone)
+        }
       })
 
   }
@@ -138,7 +160,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      {isSuccesful && <Notification actionType={actionType} currentContact={currentContactName} />}
+      {isSuccesful && <Notification actionType={actionType} currentContact={currentContactName} errorMessage={errorMessage} />}
       <Filter handleChangeSearchString={handleChangeSearchString} searchString={searchString} />
       <h3>Add a new</h3>
       <PersonForm newName={newName} newPhone={newPhone}

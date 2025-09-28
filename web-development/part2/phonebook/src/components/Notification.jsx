@@ -1,8 +1,8 @@
 import React from 'react'
 
-export const Notification = ({ currentContact, actionType }) => {
+export const Notification = ({ currentContact, actionType, errorMessage = '' }) => {
 
-  const styleContainerByAction = !(actionType === 'ACTION_ERROR' || actionType === 'ACTION_ERROR_DELETE')? 'notification-container-success' : 'notification-container-error'
+  const styleContainerByAction = !(actionType === 'ACTION_ERROR' || actionType === 'ACTION_VALIDATION_ERROR' || actionType === 'ACTION_ERROR_DELETE') ? 'notification-container-success' : 'notification-container-error'
 
   if (actionType === 'ACTION_ADD') {
     return (
@@ -16,6 +16,14 @@ export const Notification = ({ currentContact, actionType }) => {
     return (
       <div className={styleContainerByAction}>
         <div>{`Updated ${currentContact}`}</div>
+      </div>
+    )
+  }
+  if (actionType === 'ACTION_VALIDATION_ERROR') {
+    return (
+      <div className={styleContainerByAction}>
+        {/* <div>{`Information sent to server is not valid`}</div> */}
+        <div>{`${errorMessage}`}</div>
       </div>
     )
   }
