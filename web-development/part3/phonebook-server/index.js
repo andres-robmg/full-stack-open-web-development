@@ -89,7 +89,7 @@ app.get('/api/persons/:id', async (request, response, next) => {
   return Math.floor(Math.random() * 10000000)
 } */
 
-app.post('/api/persons', async (request, response) => {
+app.post('/api/persons', async (request, response, next) => {
 
   const body = request.body
 
