@@ -25,6 +25,8 @@ app.use((req, res, next) => {
   }
 })
 
+const opts = { runValidators: true };
+
 /* let persons = [
   {
     "id": 1,
@@ -127,7 +129,7 @@ app.post('/api/persons', async (request, response, next) => {
 })
 
 app.put('/api/persons/:id', async (request, response, next) => {
-  await Person.findByIdAndUpdate(request.params.id, request.body)
+  await Person.findByIdAndUpdate(request.params.id, request.body, opts)
     .then(person => {
       if (person) {
         response.json(person)
