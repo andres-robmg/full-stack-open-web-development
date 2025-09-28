@@ -62,7 +62,7 @@ const App = () => {
     })
       .then(e => refreshList())
       .catch(error => {
-        if (error.status === HttpStatusCode.BadRequest) {
+        if (error.response && error.response.status === HttpStatusCode.BadRequest) {
           setErrorMessage(error.response.data.error)
           setActionType('ACTION_VALIDATION_ERROR')
           enableNotification()
@@ -83,7 +83,7 @@ const App = () => {
     })
       .then(e => refreshList())
       .catch(error => {
-        if (error.status === HttpStatusCode.BadRequest) {
+        if (error.response && error.response.status === HttpStatusCode.BadRequest) {
           setErrorMessage(error.response.data.error)
           setActionType('ACTION_VALIDATION_ERROR')
           enableNotification()
