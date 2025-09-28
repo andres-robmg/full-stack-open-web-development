@@ -64,7 +64,7 @@ const App = () => {
       .catch(error => {
         console.log(error)
         console.log(error.response.data.error)
-        if (error.status === 400) {
+        if (error.status === HttpStatusCode.BadRequest) {
           setErrorMessage(error.response.data.error)
           setActionType('ACTION_VALIDATION_ERROR')
           enableNotification()
@@ -75,6 +75,8 @@ const App = () => {
   }
 
   const updateContact = (id, currentContact) => {
+    const currentContactName = currentContact.name
+    const currentContactPhone = currentContact.number
     setActionType('ACTION_UPDATE')
     personService.update(id, currentContact).then(response => {
       if (response.status === HttpStatusCode.Ok) {
@@ -83,7 +85,7 @@ const App = () => {
     })
       .then(e => refreshList())
       .catch(error => {
-        if (error.status === 400) {
+        if (error.status === HttpStatusCode.BadRequest) {
           setErrorMessage(error.response.data.error)
           setActionType('ACTION_VALIDATION_ERROR')
           enableNotification()
