@@ -65,28 +65,24 @@ app.get('/info', async (request, response) => {
   }
 })
 
-app.get('/api/persons', async (request, response) => {
-  try {
-    await Person.find({}).then(persons => {
+app.get('/api/persons', async (request, response, next) => {
+  await Person.find({})
+    .then(persons => {
       response.json(persons)
     })
-  } catch (error) {
-    response.status(500).send(error.message);
-  }
+    .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', async (request, response) => {
-  try {
-    const person = await Person.findById(request.params.id)
-    if (person) {
-      response.json(person)
-    } else {
-      response.status(404).end()
-    }
-  } catch (error) {
-    response.status(400).json({ error: 'malformatted id' })
-  }
-
+app.get('/api/persons/:id', async (request, response, next) => {
+  await Person.findById(request.params.id)
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
 /* const generateId = () => {
@@ -109,7 +105,6 @@ app.post('/api/persons', async (request, response) => {
     })
   }
 
-
   try {
     const nameExists = await Person.findOne({ name: body.name })
     if (nameExists) {
@@ -126,19 +121,65 @@ app.post('/api/persons', async (request, response) => {
     const savedPerson = await person.save()
     return response.status(201).json(savedPerson)
   } catch (error) {
-    return response.status(500).json({ error: error.message })
+    next(error)
   }
 
 })
 
-app.delete('/api/persons/:id', async (request, response) => {
-  try {
-    await Person.findByIdAndDelete(request.params.id)
-    response.status(204).end()
-  } catch (error) {
-    response.status(400).json({ error: 'malformatted id' })
-  }
+app.put('/api/persons/:id', async (request, response, next) => {
+  await Person.findByIdAndUpdate(request.params.id, request.body)
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
+
 })
+
+
+app.delete('/api/persons/:id', async (request, response, next) => {
+  await Person.findByIdAndDelete(request.params.id)
+    .then((person) => {
+      if (person) {
+        response.status(204).end()
+      } else {
+        return response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
+})
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
+
+  if (error.name === 'MongoServerError') {
+    return response.status(400).json({ error: error.message })
+  }
+
+  if (!response.headersSent) {
+    response.status(500).json({ error: 'internal server error' })
+  }
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
