@@ -33,7 +33,7 @@ if (process.argv.length === 3) {
     })
 }
 
-// if the command has PASSWORD, NAME and NUMBER 
+// if the command has PASSWORD, NAME and NUMBER
 if (process.argv.length === 5) {
 
     const person = new Person({
@@ -41,7 +41,7 @@ if (process.argv.length === 5) {
         number: `${process.argv[4]}`,
     })
 
-    person.save().then(result => {
+    person.save().then(() => {
         console.log(`added ${person.name} number ${person.number} to phonebook`)
         mongoose.connection.close()
     })

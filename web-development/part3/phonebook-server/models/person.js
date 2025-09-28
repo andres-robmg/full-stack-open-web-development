@@ -7,7 +7,7 @@ console.log('connecting to', url)
 //  `mongodb+srv://db_admin:${password}@cluster0.flheoxb.mongodb.net/PhonebookApp?retryWrites=true&w=majority&appName=Cluster0`
 
 mongoose.connect(url)
-    .then(result => {
+    .then(() => {
         console.log('connected to MongoDB')
     })
     .catch(error => {
