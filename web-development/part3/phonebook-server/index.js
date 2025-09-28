@@ -1,7 +1,10 @@
+require('dotenv').config()
+
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 
+const Person = require('./models/person')
 
 morgan.token('body', (req) => JSON.stringify(req.body))
 
@@ -22,7 +25,7 @@ app.use((req, res, next) => {
   }
 })
 
-let persons = [
+/* let persons = [
   {
     "id": 1,
     "name": "Arto Hellas",
@@ -43,41 +46,54 @@ let persons = [
     "name": "Mary Poppendieck",
     "number": "39-23-6423122"
   }
-]
-
-const countContacts = persons.length
+] */
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
 
-app.get('/info', (request, response) => {
-  response.send(`
+app.get('/info', async (request, response) => {
+  try {
+    const countContacts = await Person.countDocuments({})
+    response.send(`
     <div>
     <p>Phonebook has info for ${countContacts} people</p>
     <p>${new Date()}</p>
     </div>`)
-})
-
-app.get('/api/persons', (request, response) => {
-  response.json(persons)
-})
-
-app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
-  if (person) {
-    response.json(person)
-  } else {
-    response.status(404).end()
+  } catch (error) {
+    response.status(500).send(error.message);
   }
 })
 
-const generateId = () => {
-  return Math.floor(Math.random() * 10000000)
-}
+app.get('/api/persons', async (request, response) => {
+  try {
+    await Person.find({}).then(persons => {
+      response.json(persons)
+    })
+  } catch (error) {
+    response.status(500).send(error.message);
+  }
+})
 
-app.post('/api/persons', (request, response) => {
+app.get('/api/persons/:id', async (request, response) => {
+  try {
+    const person = await Person.findById(request.params.id)
+    if (person) {
+      response.json(person)
+    } else {
+      response.status(404).end()
+    }
+  } catch (error) {
+    response.status(400).json({ error: 'malformatted id' })
+  }
+
+})
+
+/* const generateId = () => {
+  return Math.floor(Math.random() * 10000000)
+} */
+
+app.post('/api/persons', async (request, response) => {
 
   const body = request.body
 
@@ -93,30 +109,38 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const nameExists = persons.find(person => person.name === body.name)
-  if (nameExists) {
-    return response.status(400).json({
-      error: 'name must be unique'
+
+  try {
+    const nameExists = await Person.findOne({ name: body.name })
+    if (nameExists) {
+      return response.status(400).json({
+        error: 'name must be unique'
+      })
+    }
+
+    const person = new Person({
+      name: body.name,
+      number: body.number,
     })
+
+    const savedPerson = await person.save()
+    return response.status(201).json(savedPerson)
+  } catch (error) {
+    return response.status(500).json({ error: error.message })
   }
 
-  const person = {
-    id: generateId(),
-    name: body.name,
-    number: body.number,
+})
+
+app.delete('/api/persons/:id', async (request, response) => {
+  try {
+    await Person.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  } catch (error) {
+    response.status(400).json({ error: 'malformatted id' })
   }
-
-  persons = persons.concat(person)
-  response.json(person)
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  persons = persons.filter(person => person.id !== id)
-  response.status(204).end()
-})
-
-const PORT = 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

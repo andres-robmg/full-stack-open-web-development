@@ -1,11 +1,5 @@
 const mongoose = require('mongoose')
 
-// if the command has less than 3 arguments
-if (process.argv.length < 3) {
-    console.log('give password as argument')
-    process.exit(1)
-}
-
 const password = process.argv[2]
 
 const url =
@@ -21,6 +15,12 @@ const personSchema = new mongoose.Schema({
 })
 
 const Person = mongoose.model('Person', personSchema)
+
+// if the command has less than 3 arguments
+if (process.argv.length < 3) {
+    console.log('give password as argument')
+    process.exit(1)
+}
 
 // if the command has only PASSWORD
 if (process.argv.length === 3) {
