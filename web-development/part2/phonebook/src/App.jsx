@@ -62,8 +62,6 @@ const App = () => {
     })
       .then(e => refreshList())
       .catch(error => {
-        console.log(error)
-        console.log(error.response.data.error)
         if (error.status === HttpStatusCode.BadRequest) {
           setErrorMessage(error.response.data.error)
           setActionType('ACTION_VALIDATION_ERROR')
